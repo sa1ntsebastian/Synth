@@ -1,0 +1,28 @@
+{
+  "name": "hichord-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "HiChord-Web-Tool – a browser chord machine / synth playable on-screen and via Akai MPK Mini (Web MIDI)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tonal": "^6.4.3",
+    "tone": "^15.1.22",
+    "webmidi": "^3.1.16",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
+  }
+}
