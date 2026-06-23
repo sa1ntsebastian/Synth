@@ -1,4 +1,5 @@
 import * as Tone from "tone";
+import type { ADSR } from "../state/presetStore";
 
 export type DelayDivision = "OFF" | "1/4" | "1/8" | "1/16" | "1/16T" | "1/32";
 
@@ -15,7 +16,9 @@ const DELAY_TIME: Record<Exclude<DelayDivision, "OFF">, string> = {
  *
  *   input(Filter) -> AutoFilter(LFO) -> Chorus(Flanger) -> Tremolo -> Delay -> Reverb -> EQ(out)
  *
- * `glide` is not here — it is a synth `portamento` property handled by the engine.
+ * The static filter doubles as the target for the filter envelope: when the
+ * envelope is on, a Tone.FrequencyEnvelope drives the cutoff (sweep on attack);
+ * when off, the cutoff follows the manual slider. `glide` is a synth property.
  */
 export class EffectChain {
   readonly input: Tone.Filter;
@@ -29,6 +32,14 @@ export class EffectChain {
   private reverb: Tone.Reverb;
   private eq: Tone.EQ3;
 
+  // Filter / filter-envelope state
+  private filterEnv: Tone.FrequencyEnvelope;
+  private fOn = false;
+  private fCut = 20000;
+  private feOn = false;
+  private feAmt = 3;
+  private feConnected = false;
+
   constructor() {
     this.filter = new Tone.Filter(20000, "lowpass");
     this.autoFilter = new Tone.AutoFilter({ frequency: 1, depth: 0, wet: 0 }).start();
@@ -38,14 +49,63 @@ export class EffectChain {
     this.reverb = new Tone.Reverb({ decay: 2.5, wet: 0 });
     this.eq = new Tone.EQ3({ low: 0, mid: 0, high: 0 });
 
+    this.filterEnv = new Tone.FrequencyEnvelope({
+      attack: 0.01,
+      decay: 0.3,
+      sustain: 0.3,
+      release: 0.4,
+      baseFrequency: 800,
+      octaves: 3,
+    });
+
     this.filter.chain(this.autoFilter, this.chorus, this.tremolo, this.delay, this.reverb, this.eq);
     this.input = this.filter;
     this.output = this.eq;
   }
 
-  /** Static lowpass filter; off = wide open. */
+  /** Static lowpass filter; off = wide open. Coordinated with the filter envelope. */
   setFilter(on: boolean, cutoff: number): void {
-    this.filter.frequency.rampTo(on ? cutoff : 20000, 0.05);
+    this.fOn = on;
+    this.fCut = cutoff;
+    this.applyFilter();
+  }
+
+  /** Filter envelope params; when on it drives the cutoff between base and base*2^amount. */
+  setFilterEnvParams(on: boolean, env: ADSR, amountOctaves: number): void {
+    this.filterEnv.attack = env.attack;
+    this.filterEnv.decay = env.decay;
+    this.filterEnv.sustain = env.sustain;
+    this.filterEnv.release = env.release;
+    this.feOn = on;
+    this.feAmt = amountOctaves;
+    this.applyFilter();
+  }
+
+  triggerFilterEnv(time?: number): void {
+    if (this.feOn) this.filterEnv.triggerAttack(time);
+  }
+
+  releaseFilterEnv(time?: number): void {
+    if (this.feOn) this.filterEnv.triggerRelease(time);
+  }
+
+  private applyFilter(): void {
+    if (this.feOn) {
+      // Envelope drives cutoff: zero the intrinsic value so only the env signal counts.
+      if (!this.feConnected) {
+        this.filterEnv.connect(this.filter.frequency);
+        this.feConnected = true;
+      }
+      this.filter.frequency.value = 0;
+      this.filterEnv.baseFrequency = this.fCut;
+      this.filterEnv.octaves = this.feAmt;
+    } else {
+      if (this.feConnected) {
+        this.filterEnv.disconnect(this.filter.frequency);
+        this.feConnected = false;
+      }
+      this.filter.frequency.rampTo(this.fOn ? this.fCut : 20000, 0.05);
+    }
   }
 
   /** LFO-driven auto-filter (HiChord "LFO modulation"). */

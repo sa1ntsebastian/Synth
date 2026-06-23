@@ -1,5 +1,6 @@
 import { useStore } from "../state/presetStore";
 import type { DelayDivision } from "../audio/effects";
+import { EnvelopeGraph } from "./EnvelopeGraph";
 
 const DELAY_DIVS: DelayDivision[] = ["OFF", "1/4", "1/8", "1/16", "1/16T", "1/32"];
 
@@ -144,6 +145,38 @@ export function Effects() {
             onChange={(e) => s.set("bassBoost", Number(e.target.value))}
           />
         </label>
+
+        <div className="ctrl ctrl-wide">
+          <span>Filter Envelope (sweeps cutoff on attack)</span>
+          <div className="env-head">
+            <div className="seg">
+              <button
+                className={s.filterEnvOn ? "seg-on" : ""}
+                onClick={() => s.set("filterEnvOn", true)}
+              >
+                ON
+              </button>
+              <button
+                className={!s.filterEnvOn ? "seg-on" : ""}
+                onClick={() => s.set("filterEnvOn", false)}
+              >
+                OFF
+              </button>
+            </div>
+            <label className="env-amount">
+              <span>Amount {s.filterEnvAmount} oct</span>
+              <input
+                type="range"
+                min={0}
+                max={6}
+                step={0.1}
+                value={s.filterEnvAmount}
+                onChange={(e) => s.set("filterEnvAmount", Number(e.target.value))}
+              />
+            </label>
+          </div>
+          <EnvelopeGraph value={s.filtEnv} onChange={(v) => s.setEnv("filt", v)} />
+        </div>
       </div>
     </div>
   );

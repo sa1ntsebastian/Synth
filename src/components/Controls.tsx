@@ -2,6 +2,7 @@ import { KEYS, SCALE_NAMES, type VoiceCount } from "../music/theory";
 import { ENVELOPES, useStore, type EnvelopeName } from "../state/presetStore";
 import { INSTRUMENTS, getInstrument } from "../audio/instruments";
 import { Waveform } from "./Waveform";
+import { EnvelopeGraph } from "./EnvelopeGraph";
 
 const VOICE_OPTIONS: VoiceCount[] = [1, 2, 4, 8];
 
@@ -72,19 +73,17 @@ export function Controls() {
         </div>
       </div>
 
-      <label className="ctrl">
-        <span>Envelope</span>
-        <select
-          value={s.envelope}
-          onChange={(e) => s.set("envelope", e.target.value as EnvelopeName)}
-        >
+      <div className="ctrl ctrl-wide">
+        <span>Amp Envelope (drag to edit)</span>
+        <div className="env-presets">
           {(Object.keys(ENVELOPES) as EnvelopeName[]).map((name) => (
-            <option key={name} value={name}>
+            <button key={name} onClick={() => s.setEnv("amp", { ...ENVELOPES[name] })}>
               {name}
-            </option>
+            </button>
           ))}
-        </select>
-      </label>
+        </div>
+        <EnvelopeGraph value={s.ampEnv} onChange={(v) => s.setEnv("amp", v)} />
+      </div>
 
       <label className="ctrl">
         <span>Instrument</span>

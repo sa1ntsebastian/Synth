@@ -2,7 +2,7 @@ import { useStore } from "../state/presetStore";
 
 /** Small status readout, echoing the HiChord screen. */
 export function Display() {
-  const { key, scale, octaveShift, inversion, voices, envelope, stereo, midiEnabled, midiDeviceName } =
+  const { key, scale, octaveShift, inversion, voices, stereo, midiEnabled, midiDeviceName } =
     useStore();
 
   return (
@@ -17,7 +17,6 @@ export function Display() {
         <span>OCT {octaveShift >= 0 ? `+${octaveShift}` : octaveShift}</span>
         <span>INV {inversion}</span>
         <span>{voices} OSC</span>
-        <span>{envelope}</span>
       </div>
       <div className="display-row display-midi">
         <span className={midiEnabled ? "midi-on" : "midi-off"}>

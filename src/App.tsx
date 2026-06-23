@@ -31,7 +31,7 @@ export default function App() {
   // ---- engine parameter sync (preset -> audio) ---------------------------
   const s = useStore();
   useEffect(() => engine.setInstrument(s.instrument), [s.instrument]);
-  useEffect(() => engine.setEnvelope(s.envelope), [s.envelope]);
+  useEffect(() => engine.setAmpEnvelope(s.ampEnv), [s.ampEnv]);
   useEffect(() => engine.setStereo(s.stereo), [s.stereo]);
   useEffect(() => engine.setGlide(s.glide), [s.glide]);
   useEffect(() => engine.setMasterVolume(s.masterVolume), [s.masterVolume]);
@@ -46,6 +46,10 @@ export default function App() {
   );
   useEffect(() => engine.setReverb(s.reverb), [s.reverb]);
   useEffect(() => engine.setBassBoost(s.bassBoost), [s.bassBoost]);
+  useEffect(
+    () => engine.setFilterEnv(s.filterEnvOn, s.filtEnv, s.filterEnvAmount),
+    [s.filterEnvOn, s.filtEnv, s.filterEnvAmount],
+  );
 
   // ---- rhythm lifecycle --------------------------------------------------
   useEffect(() => setBpm(s.bpm), [s.bpm]);

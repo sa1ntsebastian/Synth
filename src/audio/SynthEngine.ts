@@ -1,7 +1,9 @@
 import * as Tone from "tone";
-import { ENVELOPES, type EnvelopeName } from "../state/presetStore";
+import { type ADSR } from "../state/presetStore";
 import { EffectChain, type DelayDivision } from "./effects";
 import { getInstrument } from "./instruments";
+
+const DEFAULT_AMP_ENV: ADSR = { attack: 0.02, decay: 0.3, sustain: 0.8, release: 2.0 };
 
 /** Anything the engine can play polyphonically (synth voices or a mic sampler). */
 type Instrument = Tone.PolySynth | Tone.Sampler;
@@ -21,7 +23,7 @@ export class SynthEngine {
 
   private held = new Map<string, string[]>();
   private arpEnabled = false;
-  private envelopeName: EnvelopeName = "LONG";
+  private ampEnv: ADSR = DEFAULT_AMP_ENV;
   private glide = 0;
 
   private sampler: Tone.Sampler | null = null;
@@ -75,7 +77,7 @@ export class SynthEngine {
 
   private applyEnvelope(): void {
     if (this.instrument instanceof Tone.PolySynth) {
-      this.instrument.set({ envelope: ENVELOPES[this.envelopeName] });
+      this.instrument.set({ envelope: this.ampEnv });
     }
   }
 
@@ -85,9 +87,14 @@ export class SynthEngine {
     }
   }
 
-  setEnvelope(name: EnvelopeName): void {
-    this.envelopeName = name;
+  setAmpEnvelope(env: ADSR): void {
+    this.ampEnv = env;
     this.applyEnvelope();
+  }
+
+  /** Filter envelope: sweeps the cutoff on note attack (classic synth movement). */
+  setFilterEnv(on: boolean, env: ADSR, amountOctaves: number): void {
+    this.effects.setFilterEnvParams(on, env, amountOctaves);
   }
 
   setGlide(seconds: number): void {
@@ -134,8 +141,10 @@ export class SynthEngine {
   // ---- notes ---------------------------------------------------------------
   noteOn(id: string, notes: string[]): void {
     if (notes.length === 0 || this.held.has(id)) return;
+    const first = this.held.size === 0;
     this.held.set(id, notes);
     if (!this.arpEnabled) this.instrument.triggerAttack(notes);
+    if (first) this.effects.triggerFilterEnv();
   }
 
   noteOff(id: string): void {
@@ -143,6 +152,7 @@ export class SynthEngine {
     if (!notes) return;
     this.held.delete(id);
     if (!this.arpEnabled) this.instrument.triggerRelease(notes);
+    if (this.held.size === 0) this.effects.releaseFilterEnv();
   }
 
   /** Flattened set of currently-held notes (used by the arpeggiator). */

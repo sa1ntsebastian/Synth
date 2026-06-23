@@ -2,10 +2,18 @@ import { create } from "zustand";
 import type { VoiceCount } from "../music/theory";
 import type { DelayDivision } from "../audio/effects";
 
+/** Attack / Decay / Sustain / Release envelope shape. */
+export interface ADSR {
+  attack: number;
+  decay: number;
+  sustain: number;
+  release: number;
+}
+
 /** Envelope shape presets, mirroring HiChord's named envelopes. */
 export type EnvelopeName = "LONG" | "SHORT" | "SWELL" | "PLUCK" | "TOUCH" | "SUSTAIN";
 
-export const ENVELOPES: Record<EnvelopeName, { attack: number; decay: number; sustain: number; release: number }> = {
+export const ENVELOPES: Record<EnvelopeName, ADSR> = {
   LONG: { attack: 0.02, decay: 0.3, sustain: 0.8, release: 2.0 },
   SHORT: { attack: 0.005, decay: 0.2, sustain: 0.0, release: 0.25 },
   SWELL: { attack: 0.8, decay: 0.2, sustain: 1.0, release: 1.5 },
@@ -46,10 +54,15 @@ export interface PresetState {
 
   // Sound
   instrument: string;
-  envelope: EnvelopeName;
+  ampEnv: ADSR;
   stereo: boolean;
   glide: number;
   masterVolume: number;
+
+  // Filter envelope (sweeps the filter cutoff on note attack)
+  filterEnvOn: boolean;
+  filterEnvAmount: number; // octaves
+  filtEnv: ADSR;
 
   // Effects
   filterOn: boolean;
@@ -94,6 +107,7 @@ export interface AppState extends PresetState {
   pressButton: (i: number) => void;
   releaseButton: (i: number) => void;
   toggleDrumStep: (track: DrumTrack, step: number) => void;
+  setEnv: (which: "amp" | "filt", value: ADSR) => void;
   setMidiLearn: (target: keyof PresetState | null) => void;
   bindMidi: (cc: number) => void;
   loadPreset: (preset: PresetState) => void;
@@ -109,10 +123,14 @@ export const DEFAULT_PRESET: PresetState = {
   voices: 4,
 
   instrument: "saw",
-  envelope: "LONG",
+  ampEnv: { ...ENVELOPES.LONG },
   stereo: true,
   glide: 0,
   masterVolume: 0.8,
+
+  filterEnvOn: false,
+  filterEnvAmount: 3,
+  filtEnv: { attack: 0.01, decay: 0.3, sustain: 0.3, release: 0.4 },
 
   filterOn: false,
   filterCutoff: 4000,
@@ -165,6 +183,8 @@ export const useStore = create<AppState>((set, get) => ({
       return { drumPattern: { ...s.drumPattern, [track]: row } };
     }),
 
+  setEnv: (which, value) => set(which === "amp" ? { ampEnv: value } : { filtEnv: value }),
+
   setMidiLearn: (target) => set({ midiLearnTarget: target }),
   bindMidi: (cc) =>
     set((s) => {
@@ -172,14 +192,16 @@ export const useStore = create<AppState>((set, get) => ({
       return { midiMap: { ...s.midiMap, [cc]: s.midiLearnTarget }, midiLearnTarget: null };
     }),
 
-  loadPreset: (preset) => set({ ...preset }),
+  // Merge over defaults so presets saved under an older schema still load cleanly.
+  loadPreset: (preset) => set({ ...DEFAULT_PRESET, ...structuredClone(preset) }),
   exportPreset: () => {
     const s = get();
     const out = {} as PresetState;
     for (const k of PRESET_KEYS) {
-      // deep-copy the drum grid so saved presets don't alias live state
+      const v = s[k];
+      // deep-copy object fields (drum grid, envelopes) so presets don't alias live state
       (out as unknown as Record<string, unknown>)[k] =
-        k === "drumPattern" ? structuredClone(s.drumPattern) : s[k];
+        v !== null && typeof v === "object" ? structuredClone(v) : v;
     }
     return out;
   },
