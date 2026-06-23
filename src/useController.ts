@@ -25,7 +25,7 @@ export function useController() {
       voices: s.voices,
     });
     heldRef.current.set(button, notes);
-    engine.triggerChord(notes);
+    engine.noteOn(`btn${button}`, notes);
     s.pressButton(button);
   }, []);
 
@@ -33,7 +33,7 @@ export function useController() {
     const notes = heldRef.current.get(button);
     if (!notes) return;
     heldRef.current.delete(button);
-    engine.releaseChord(notes);
+    engine.noteOff(`btn${button}`);
     useStore.getState().releaseButton(button);
   }, []);
 

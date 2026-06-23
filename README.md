@@ -17,41 +17,50 @@ Open the page, click **Start** (browser autoplay policy requires a user gesture)
 then play the 7 chord pads with the mouse/touch, the keys **A S D F G H J**, or a
 connected MIDI keyboard (click **Enable MIDI**).
 
-## Status — Phase 1 (Core Chord-Synth)
+## Status — all phases implemented
 
-Implemented:
+- **Harmony** — 7 diatonic **chord buttons** (C Major → C, Dm, Em, F, G, Am, Bdim),
+  **Key** (12), **Scale/Mode** (10), **Octave** (−1…+2), **Inversions**, **Voices** (1/2/4/8)
+- **Sound** — instrument engines (Saw/Square/Tri/Sine, Pad, FM E-Piano/Brass/Bell, Pluck),
+  **Envelope** presets, **Glide**, **Stereo/Mono**, master **Volume**
+- **Effects** — Filter + Cutoff, LFO mod, Flanger (chorus), Tremolo, Delay (1/4…1/32),
+  Reverb, Bass Boost
+- **Rhythm** — Arpeggiator (up/down/updown/random/as-played), **BPM** (40–300) + Tap Tempo,
+  16-step **Drum machine** (2 kits), Metronome
+- **Studio** — multi-track **Looper** (record/overdub/clear), **Mic sampling** (played
+  chromatically as the "sample" instrument), simplified **Vocoder**
+- **Presets** — save/load full state to **localStorage** slots P1–P4
+- **Input** — on-screen pads, computer keyboard (A–J), and **Web MIDI** with default knob
+  mapping (CC 70–77) plus **MIDI-learn**
 
-- 7 diatonic **chord buttons** (e.g. C Major → C, Dm, Em, F, G, Am, Bdim)
-- **Key** (12) and **Scale/Mode** (Major, Minor, Dorian, Phrygian, Lydian,
-  Mixolydian, Locrian, Harmonic/Melodic Minor, Pentatonic)
-- **Octave** shift (−1…+2), **Inversions** (0–3), **Voices** (1/2/4/8 OSC layering)
-- **Envelope** presets (LONG/SHORT/SWELL/PLUCK/TOUCH/SUSTAIN), **Oscillator** type,
-  **Stereo/Mono**, master **Volume**
-- Input: on-screen pads, computer keyboard, and **Web MIDI** (notes → chord buttons,
-  knobs → parameters)
+> Note: Mic sampling and the vocoder request microphone permission. Web MIDI works in
+> Chromium-based browsers. The vocoder adds a parallel vocoded layer (approximation).
 
 ### Architecture
 
 A single **preset state** ([`src/state/presetStore.ts`](src/state/presetStore.ts),
-Zustand) is the source of truth; the UI, MIDI and audio engine all read/write it.
+Zustand) is the source of truth; the UI, MIDI and audio engine all read/write it. The app
+syncs every parameter into the audio engine via `useEffect` hooks in `App.tsx`.
 
 ```
 src/
-  audio/SynthEngine.ts   Tone.js: PolySynth -> StereoWidener -> Volume
-  music/theory.ts        Tonal: diatonic chords, inversions, voice layering, labels
-  midi/mpkMini.ts        WebMidi: keys/pads -> buttons, knobs -> params
-  state/presetStore.ts   Zustand store = the "preset"
-  components/            Display, ChordPads, Controls
-  useController.ts       press/release -> notes -> engine
+  audio/
+    SynthEngine.ts   swappable instrument -> effects -> widener -> volume; held-note + arp
+    instruments.ts   Tone synth/FM/AM voice presets
+    effects.ts       filter, auto-filter (LFO), chorus, tremolo, delay, reverb, EQ
+    Arp.ts           Tone.Loop arpeggiator over the engine's held notes
+    DrumMachine.ts   Tone.Sequence 16-step synthesized drums
+    transport.ts     BPM, tap tempo, metronome
+    Looper.ts        Tone.Recorder multi-track looper
+    Sampler.ts       mic -> Tone.Sampler ("sample" instrument)
+    Vocoder.ts       band-vocoder (mic modulates synth carrier)
+  music/theory.ts    Tonal: diatonic chords, inversions, voice layering, labels
+  midi/              WebMidi input + CC mapping / MIDI-learn
+  state/             Zustand store + localStorage presets
+  components/        Display, ChordPads, Controls, Effects, Rhythm, DrumGrid, Studio,
+                     PresetBar, MidiPanel
+  useController.ts   press/release -> notes -> engine
 ```
-
-## Roadmap (remaining HiChord features)
-
-- **Phase 2** — more sound engines (samples, FM) + effects chain (reverb, delay,
-  flanger, tremolo, filter+cutoff, LFO, glide, bass boost)
-- **Phase 3** — arpeggiator, drum machine + sequencer, BPM/tap-tempo, metronome
-- **Phase 4** — looper (record/overdub, auto-bounce) and mic sampling (auto-tune to C)
-- **Phase 5** — vocoder, full preset save/load (P1–P4), configurable MIDI-learn
 
 ## HiChord settings reference (research)
 

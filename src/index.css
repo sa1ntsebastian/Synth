@@ -256,3 +256,198 @@ body {
   font-weight: 700;
   cursor: pointer;
 }
+
+/* Panels ----------------------------------------------------------------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid #2a2a34;
+  border-radius: 12px;
+  padding: 12px 16px 16px;
+}
+.panel-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-2);
+  margin: 0 0 12px;
+}
+.panel .controls {
+  border: none;
+  padding: 0;
+  background: none;
+}
+.big-btn {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid #3a3a48;
+  border-radius: 8px;
+  padding: 8px 0;
+  cursor: pointer;
+  font-weight: 700;
+}
+.big-btn:active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Drum grid -------------------------------------------------------------- */
+.drum-grid {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.drum-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.drum-label {
+  width: 52px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.drum-steps {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 4px;
+  flex: 1;
+}
+.step {
+  aspect-ratio: 1;
+  background: var(--panel-2);
+  border: 1px solid #34343f;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+}
+.step-beat {
+  border-color: #4a4a58;
+}
+.step-on {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+}
+
+/* Studio ----------------------------------------------------------------- */
+.studio {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+.studio-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.studio-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.loop-tracks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.loop-btn {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid #3a3a48;
+  border-radius: 8px;
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 12px;
+}
+.loop-recording {
+  background: #d63a6c;
+  border-color: #d63a6c;
+  animation: pulse 1s infinite;
+}
+.loop-playing {
+  background: #1f5e44;
+  border-color: #2e8a64;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Preset bar ------------------------------------------------------------- */
+.preset-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.preset-title {
+  font-size: 12px;
+  color: var(--muted);
+}
+.preset-slot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--panel-2);
+  border: 1px solid #3a3a48;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+.preset-slot.filled {
+  border-color: var(--accent-2);
+}
+.preset-name {
+  font-weight: 700;
+  font-size: 13px;
+}
+.preset-slot button {
+  background: none;
+  border: none;
+  color: var(--accent-2);
+  cursor: pointer;
+  font-size: 12px;
+}
+.preset-slot button:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+.preset-status {
+  font-size: 12px;
+  color: #5cf2a8;
+}
+
+/* MIDI panel ------------------------------------------------------------- */
+.midi-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.midi-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.midi-learn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.midi-learn select {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid #3a3a48;
+  border-radius: 8px;
+  padding: 6px;
+}
+.learn-hint {
+  color: var(--accent);
+  animation: pulse 1s infinite;
+}
+.midi-maps {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--muted);
+}

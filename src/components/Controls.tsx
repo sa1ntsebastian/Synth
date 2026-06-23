@@ -1,13 +1,8 @@
 import { KEYS, SCALE_NAMES, type VoiceCount } from "../music/theory";
-import {
-  ENVELOPES,
-  useStore,
-  type EnvelopeName,
-  type OscType,
-} from "../state/presetStore";
+import { ENVELOPES, useStore, type EnvelopeName } from "../state/presetStore";
+import { INSTRUMENTS } from "../audio/instruments";
 
 const VOICE_OPTIONS: VoiceCount[] = [1, 2, 4, 8];
-const OSC_OPTIONS: OscType[] = ["sawtooth", "square", "triangle", "sine"];
 
 /** Parameter controls for the Phase 1 core chord synth. */
 export function Controls() {
@@ -91,11 +86,11 @@ export function Controls() {
       </label>
 
       <label className="ctrl">
-        <span>Oscillator</span>
-        <select value={s.oscType} onChange={(e) => s.set("oscType", e.target.value as OscType)}>
-          {OSC_OPTIONS.map((o) => (
-            <option key={o} value={o}>
-              {o}
+        <span>Instrument</span>
+        <select value={s.instrument} onChange={(e) => s.set("instrument", e.target.value)}>
+          {INSTRUMENTS.map((inst) => (
+            <option key={inst.id} value={inst.id}>
+              {inst.name}
             </option>
           ))}
         </select>
