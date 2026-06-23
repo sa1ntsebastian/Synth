@@ -19,6 +19,9 @@ import { MidiPanel } from "./components/MidiPanel";
 
 const KEY_MAP: Record<string, number> = { a: 0, s: 1, d: 2, f: 3, g: 4, h: 5, j: 6 };
 
+// Resolve the public icon against the configured base URL so it works in subfolders.
+const ICON_URL = `${import.meta.env.BASE_URL}dabey-icon.svg`;
+
 export default function App() {
   const { press, release } = useController();
   const audioReady = useStore((s) => s.audioReady);
@@ -124,7 +127,7 @@ export default function App() {
       {!audioReady && (
         <div className="overlay" onClick={handleStart}>
           <div className="overlay-card">
-            <img className="overlay-icon" src="/dabey-icon.svg" alt="dabey" />
+            <img className="overlay-icon" src={ICON_URL} alt="dabey" />
             <h1>HiChord</h1>
             <p>sei dabei. spontan. echt.</p>
             <button className="start-btn">▶ Start</button>
@@ -134,7 +137,7 @@ export default function App() {
 
       <header className="topbar">
         <div className="brand">
-          <img className="brand-icon" src="/dabey-icon.svg" alt="dabey" />
+          <img className="brand-icon" src={ICON_URL} alt="dabey" />
           <div className="brand-text">
             <h1>HiChord</h1>
             <span className="brand-tag">by dabey</span>
