@@ -5,6 +5,9 @@ Built with **React + Vite + TypeScript**, audio via **Tone.js**, music theory vi
 **Tonal**, and playable on-screen, with the computer keyboard, or via a MIDI
 controller such as the **Akai MPK Mini** (Web MIDI API).
 
+Styled to the **dabey** brand theme (warm terracotta/sand palette, Fraunces + DM Sans,
+map-pin icon) per the project design spec.
+
 ## Run it
 
 ```bash

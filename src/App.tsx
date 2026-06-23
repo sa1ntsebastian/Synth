@@ -124,15 +124,22 @@ export default function App() {
       {!audioReady && (
         <div className="overlay" onClick={handleStart}>
           <div className="overlay-card">
-            <h1>HiChord Web</h1>
-            <p>Tap to start audio</p>
+            <img className="overlay-icon" src="/dabey-icon.svg" alt="dabey" />
+            <h1>HiChord</h1>
+            <p>sei dabei. spontan. echt.</p>
             <button className="start-btn">▶ Start</button>
           </div>
         </div>
       )}
 
       <header className="topbar">
-        <h1>HiChord Web</h1>
+        <div className="brand">
+          <img className="brand-icon" src="/dabey-icon.svg" alt="dabey" />
+          <div className="brand-text">
+            <h1>HiChord</h1>
+            <span className="brand-tag">by dabey</span>
+          </div>
+        </div>
         <PresetBar />
       </header>
 
