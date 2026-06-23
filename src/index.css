@@ -276,6 +276,27 @@ body {
   accent-color: var(--accent);
 }
 
+.waveform {
+  display: block;
+  margin-top: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 4px;
+}
+.waveform-path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.waveform-axis {
+  stroke: var(--border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
 .seg {
   display: flex;
   gap: 6px;

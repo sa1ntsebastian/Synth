@@ -1,5 +1,8 @@
 import * as Tone from "tone";
 
+/** The waveform shape used to visualize an instrument's character. */
+export type WaveShape = "sine" | "triangle" | "sawtooth" | "square";
+
 /**
  * Instrument registry. Each instrument is a self-contained polyphonic Tone voice,
  * built on demand. No external sample assets are used, so everything works offline.
@@ -7,10 +10,14 @@ import * as Tone from "tone";
  *
  * Replaces the old standalone `oscType` field — instrument selection now drives
  * the core timbre. The engine still applies the user's envelope/voices on top.
+ *
+ * `wave` is the representative waveform shown in the UI (for FM/AM voices it's the
+ * closest visual approximation of their character).
  */
 export interface InstrumentDef {
   id: string;
   name: string;
+  wave: WaveShape;
   build: () => Tone.PolySynth;
 }
 
@@ -18,26 +25,31 @@ export const INSTRUMENTS: InstrumentDef[] = [
   {
     id: "saw",
     name: "Saw",
+    wave: "sawtooth",
     build: () => new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sawtooth" } }),
   },
   {
     id: "square",
     name: "Square",
+    wave: "square",
     build: () => new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" } }),
   },
   {
     id: "triangle",
     name: "Triangle",
+    wave: "triangle",
     build: () => new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" } }),
   },
   {
     id: "sine",
     name: "Sine",
+    wave: "sine",
     build: () => new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sine" } }),
   },
   {
     id: "pad",
     name: "Pad",
+    wave: "sawtooth",
     build: () =>
       new Tone.PolySynth(Tone.Synth, {
         oscillator: { type: "fatsawtooth", count: 3, spread: 30 },
@@ -46,6 +58,7 @@ export const INSTRUMENTS: InstrumentDef[] = [
   {
     id: "fmEPiano",
     name: "FM E-Piano",
+    wave: "sine",
     build: () =>
       new Tone.PolySynth(Tone.FMSynth, {
         harmonicity: 3,
@@ -57,6 +70,7 @@ export const INSTRUMENTS: InstrumentDef[] = [
   {
     id: "fmBrass",
     name: "FM Brass",
+    wave: "sawtooth",
     build: () =>
       new Tone.PolySynth(Tone.FMSynth, {
         harmonicity: 1,
@@ -67,6 +81,7 @@ export const INSTRUMENTS: InstrumentDef[] = [
   {
     id: "fmBell",
     name: "FM Bell",
+    wave: "sine",
     build: () =>
       new Tone.PolySynth(Tone.FMSynth, {
         harmonicity: 3.5,
@@ -77,6 +92,7 @@ export const INSTRUMENTS: InstrumentDef[] = [
   {
     id: "pluck",
     name: "Pluck",
+    wave: "triangle",
     build: () =>
       new Tone.PolySynth(Tone.AMSynth, {
         harmonicity: 2,

@@ -1,6 +1,7 @@
 import { KEYS, SCALE_NAMES, type VoiceCount } from "../music/theory";
 import { ENVELOPES, useStore, type EnvelopeName } from "../state/presetStore";
-import { INSTRUMENTS } from "../audio/instruments";
+import { INSTRUMENTS, getInstrument } from "../audio/instruments";
+import { Waveform } from "./Waveform";
 
 const VOICE_OPTIONS: VoiceCount[] = [1, 2, 4, 8];
 
@@ -94,6 +95,7 @@ export function Controls() {
             </option>
           ))}
         </select>
+        <Waveform shape={getInstrument(s.instrument).wave} />
       </label>
 
       <div className="ctrl">
